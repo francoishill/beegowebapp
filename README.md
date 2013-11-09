@@ -1,10 +1,9 @@
 # What is this?
 
-An open source project for Gopher community.
+An open source project to create a skeleton of a [Beego](https://github.com/astaxie/beego) website.
 
-## Development
+The aim is to have all the basics of a website, like User registration, login, password reset, etc. It will also include clientside libraries like AngularJS and Bootstrap.
 
-[Trello board](https://trello.com/b/UaQ9BSoB)
 
 ## License
 
