@@ -11,13 +11,15 @@
                     "AngularJS/1.2.0rc1/angular.min.js",
                     "bootstrap/ui-bootstrap-tpls-0.6.0.min.js",
                     "jquery/1.10.2/jquery.min.js",
-                    "lib.min.js"
+                    "lib.min.js",
+                    "prettify.js"
                 ],
 				"SkipFiles": [
                     "AngularJS/1.2.0rc1/angular.min.js",
                     "bootstrap/ui-bootstrap-tpls-0.6.0.min.js",
                     "jquery/1.10.2/jquery.min.js",
-                    "lib.min.js"
+                    "lib.min.js",
+                    "prettify.js"
                 ]
 			},
 			"app": {
@@ -49,6 +51,7 @@
 					"bootstrap-theme.css",
 					"font-awesome.min.css",
                     "select2.css",
+                    "prettify.css",
                     "overrides.css"
                 ],
 				"SkipFiles": [
