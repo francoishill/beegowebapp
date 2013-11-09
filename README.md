@@ -33,6 +33,7 @@ We have also included the following libraries into the design (they are laid out
 0. [AngularJS](http://angularjs.org/), created by Google and is the missing link between HTML and Javascript
 0. [Bootstrap](http://getbootstrap.com/2.3.2/), created by Twitter and is a front-end framework
 0. [jQuery](http://jquery.com/), do we really need to say what jQuery is?
+0. [SASS](http://sass-lang.com/), a CSS-precompiler
 
 
 # Installation
