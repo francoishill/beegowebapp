@@ -71,4 +71,5 @@ Please feel free to contribute or to contact me.
 
 ## License
 
-[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+[The MIT License (MIT)](http://opensource.org/licenses/MIT).
+
