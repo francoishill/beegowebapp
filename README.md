@@ -5,6 +5,10 @@ An open source project to create a skeleton of a [Beego](https://github.com/asta
 The aim is to have all the basics of a website, like User registration, login, password reset, etc. It will also include clientside libraries like AngularJS and Bootstrap.
 
 
+# Contribution
+
+Please feel free to contribute or to contact me.
+
 ## License
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
