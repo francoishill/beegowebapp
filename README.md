@@ -38,7 +38,7 @@ We have also included the following libraries into the design (they are laid out
 
 # Installation
 
-Here we will describe the steps to get you up and running. There are many dependencies which we will also help guide you to install.
+0. #### Here are the dependencies to be installed.
 
 ```bash
 go get github.com/astaxie/beego
@@ -50,19 +50,83 @@ go get github.com/go-sql-driver/mysql
 go get github.com/francoishill/beegowebapp
 ```
 
-Now go and install the cloning tool and follow its instructions:
-[https://github.com/francoishill/clonebeegowebapp](https://github.com/francoishill/clonebeegowebapp).
+0. #### Now install the cloning tool
+
+    ```bash
+    cd $GOPATH/src/github.com/francoishill/beegowebapp
+    ./install_cloner.sh
+    ```
+
+0. #### Additional (non-default) packages that can be used by this application/beego:
+
+    0. memcache: https://github.com/youtube/vitess
+    0. redis: github.com/garyburd/redigo/redis
+    0. x2jXML: github.com/clbanning/x2j
+    0. goyaml2: github.com/wendal/goyaml2
+    0. postgres: github.com/lib/pq
+    0. sqlite3: github.com/mattn/go-sqlite3
+    0. websockets: github.com/garyburd/go-websocket/websocket
 
 
-# *Additional (non-default) packages that can be used by this application/beego:*
+# Quick Start
 
-0. memcache: https://github.com/youtube/vitess
-0. redis: github.com/garyburd/redigo/redis
-0. x2jXML: github.com/clbanning/x2j
-0. goyaml2: github.com/wendal/goyaml2
-0. postgres: github.com/lib/pq
-0. sqlite3: github.com/mattn/go-sqlite3
-0. websockets: github.com/garyburd/go-websocket/websocket
+0. #### Generate your first web app (based on the [Beego](https://github.com/astaxie/beego) framework)
+
+    ```bash
+    cd /temp
+    clonebeegowebapp blank "myfirstapp"
+    ```
+    
+0. #### Important changes required in file *"app\_general.ini"* found in the **"conf"** folder.
+
+    ```ini
+    [app]
+    app_name = My Web Application
+
+    session_path = sess_db_username:sess_db_password@/sess_db_name?charset=utf8
+    session_name = myapp_session
+    mail_user = Myapp Mailer
+    mail_from = admin@myapp.com
+    secret_key = 1234abc890def567
+    
+    [orm]
+    data_source = main_db_username:main_db_password@/main_db_name?charset=utf8
+    ```
+    
+0. #### Have a look at the file **"app\_machine\_specific.ini"** too.
+    
+    
+0. #### If you configured mysql to be the session provider, create its required table with the following SQL:
+
+    ```sql
+    CREATE TABLE `session` (
+        `session_key` char(64) NOT NULL,
+        `session_data` blob,
+        `session_expiry` int(11) unsigned NOT NULL,
+        PRIMARY KEY (`session_key`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    ```
+    
+0. #### Run the migration to generate the required tables.
+
+    Run the script `db/migrate_windows.bat` (or `db/migrate_linux.sh` if on linux) to create all the tables for models registerd with `orm.RegisterModel`. By default this will be like the *User* model.
+    
+    This migration status will be logged into a timestamped file inside *db/migrations/windows* or *db/migrations/linux*.
+    
+    **Double check** this log to ensure everything ran smoothly.
+    
+    
+## Running on another machine
+
+If you want to run the web app on another machine you will only need to copy the executable and two folders (in development mode it is three folders).
+
+In production mode: 
+
+    static (the complete folder)
+    views (the complete folder)
+    ??.exe (your applications' executable, on windows it will have the extension .exe)
+    
+In **development** mode is the same as production but you will also need to copy the *static_source* folder.
 
 
 # Contribution
