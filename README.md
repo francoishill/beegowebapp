@@ -118,10 +118,11 @@ go get github.com/francoishill/beegowebapp
     
 ## Running on another machine
 
-If you want to run the web app on another machine you will only need to copy the executable and two folders (in development mode it is three folders).
+If you want to run the web app on another machine you will only need to copy the executable and three folders (in development mode it is four folders).
 
 In production mode: 
 
+    conf (the complete folder)
     static (the complete folder)
     views (the complete folder)
     ??.exe (your applications' executable, on windows it will have the extension .exe)
