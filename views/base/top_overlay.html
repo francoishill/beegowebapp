@@ -1,0 +1,15 @@
+<!-- <div id="alertOverlay" ng-cloak="">
+	<alert ng-repeat="alert in alerts"
+		   type="alert.type"
+		   close="closeAlert($index)">
+		<span class="alertTime">{{`{{alert.time|date:'HH:mm:ss'}}`}}</span>
+		@if (Session::has('loggedin_user_id'))
+		<span class="sendFeedback" ng-if="alert.allowDeveloperFeedback">
+			<a ng-href="{{`{{generateMailToLink('[@ Config::get('admin_settings.adminEmailAddress') @]', [@ Session::get('loggedin_user_id') @], alert.msg)}}`}}"
+			   title="Click to send an email with this error to the developer">report
+			</a>
+		</span>
+		@endif
+		<pre class="alertPreWrapper">{{`{{alert.msg}}`}}</pre>
+	</alert>
+</div> -->

@@ -1,5 +1,5 @@
 {{if gt .paginator.PageNums 1}}
-<ul class="pagination pagination-sm">
+<ul class="pagination pagination-small">
     {{if .paginator.HasPrev}}
         <li><a href="{{.paginator.PageLinkFirst}}">{{i18n .Lang "paginator.first_page"}}</a></li>
         <li><a href="{{.paginator.PageLinkPrev}}">&lt;</a></li>
@@ -8,7 +8,7 @@
         <li class="disabled"><a>&lt;</a></li>
     {{end}}
     {{range $index, $page := .paginator.Pages}}
-        <li{{if $.paginator.IsActive .}} class="active"{{end}}>
+        <li{{if $.paginator.IsActivated .}} class="active"{{end}}>
             <a href="{{$.paginator.PageLink $page}}">{{$page}}</a>
         </li>
     {{end}}

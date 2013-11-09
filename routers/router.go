@@ -1,17 +1,3 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 // Package routers implemented controller methods of beego.
 package routers
 
@@ -27,8 +13,8 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/models"
-	"github.com/beego/wetalk/utils"
+	"./../models"
+	"./../utils"
 )
 
 type NestPreparer interface {
@@ -43,15 +29,21 @@ type baseRouter struct {
 	isLogin bool
 }
 
+func (this *baseRouter) SetPageTitleFromKey(pageTitleLocaleKey string) {
+	this.Data["PageTitle"] = fmt.Sprintf("%s - %s", this.Locale.Tr("app_name"), this.Locale.Tr(pageTitleLocaleKey))
+}
+
 // Prepare implemented Prepare method for baseRouter.
 func (this *baseRouter) Prepare() {
-	if utils.EnforceRedirect {
-		// if the host not matching app settings then redirect to AppUrl
-		if this.Ctx.Request.Host != utils.AppHost {
-			this.Redirect(utils.AppUrl, 302)
-			return
-		}
-	}
+	// if the host not matching app settings then redirect to AppUrl
+	/*Removed this redirect as we cannot use it on host, because we are already using port forwarding
+	if this.Ctx.Request.Host != utils.AppHost {
+		this.Redirect(utils.AppUrl, 302)
+		return
+	}*/
+
+	//this.TplExt = "html.go"
+	this.Layout = "master.html"
 
 	// page start time
 	this.Data["PageStartTime"] = time.Now()
@@ -73,7 +65,7 @@ func (this *baseRouter) Prepare() {
 		this.Data["IsLogin"] = this.isLogin
 
 		// if user forbided then do logout
-		if this.user.IsForbid {
+		if this.user.IsBanned {
 			models.LogoutUser(&this.Controller)
 			this.FlashRedirect("/login", 302, "UserForbid")
 			return
@@ -92,6 +84,8 @@ func (this *baseRouter) Prepare() {
 	this.Data["AppLogo"] = utils.AppLogo
 	this.Data["AvatarURL"] = utils.AvatarURL
 	this.Data["IsProMode"] = utils.IsProMode
+	this.Data["DateFormat"] = utils.DateFormat
+	this.Data["DateTimeFormat"] = utils.DateTimeFormat
 
 	// Redirect to make URL clean.
 	if this.setLang() {
@@ -112,6 +106,8 @@ func (this *baseRouter) Prepare() {
 	if this.Ctx.Request.Method == "GET" {
 		this.FormOnceCreate()
 	}
+
+	this.SetPageTitleFromKey("pagetitles.default") //Needs to happen after "this.setLang()"
 
 	if app, ok := this.AppController.(NestPreparer); ok {
 		app.NestPrepare()
@@ -140,19 +136,14 @@ func (this *baseRouter) CheckActiveRedirect(args ...interface{}) bool {
 		}
 	}
 	if needActive {
-		// check login
-		if this.CheckLoginRedirect() {
-			return true
-		}
-
 		// redirect to active page
-		if !this.user.IsActive {
+		if !this.user.IsActivated {
 			this.FlashRedirect("/settings/profile", code, "NeedActive")
 			return true
 		}
 	} else {
 		// no need active
-		if this.user.IsActive {
+		if this.user.IsActivated {
 			if redirect_to == "" {
 				redirect_to = "/"
 			}
@@ -177,7 +168,7 @@ func (this *baseRouter) CheckLoginRedirect(args ...interface{}) bool {
 			// custom redirect url
 			redirect_to = v
 		case int:
-			// custom redirect url
+			// custom redirect code
 			code = v
 		}
 	}
@@ -280,7 +271,7 @@ func (this *baseRouter) FlashRedirect(uri string, code int, flag string, args ..
 	}
 
 	if len(uri) == 0 || uri[0] != '/' {
-		panic("flash reirect only support same host redirect")
+		panic("flash redirect only supports the same host redirect")
 	}
 
 	params := []interface{}{uri, code, flag, flagVal, times}

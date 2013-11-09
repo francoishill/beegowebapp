@@ -1,26 +1,12 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 package routers
 
 import (
+	"./../utils"
 	"github.com/astaxie/beego"
 	"github.com/beego/i18n"
-	"github.com/beego/wetalk/utils"
 	"strings"
 
-	"github.com/beego/wetalk/models"
+	"./../models"
 )
 
 // LoginRouter serves login page.
@@ -32,10 +18,11 @@ type LoginRouter struct {
 func (this *LoginRouter) Get() {
 	this.Data["IsLoginPage"] = true
 	this.TplNames = "auth/login.html"
+	this.SetPageTitleFromKey("pagetitles.user_login")
 
 	loginRedirect := strings.TrimSpace(this.GetString("to"))
 	if utils.IsMatchHost(loginRedirect) == false {
-		loginRedirect = "/"
+		loginRedirect = "/home"
 	}
 
 	// no need login
@@ -47,11 +34,11 @@ func (this *LoginRouter) Get() {
 		this.Ctx.SetCookie("login_to", loginRedirect, 0, "/")
 	}
 
-	form := models.LoginForm{}
+	form := models.LoginForm{Locale: this.Locale}
 	this.SetFormSets(&form)
 }
 
-// Login implemented user login.
+// Login implemented POST user login.
 func (this *LoginRouter) Login() {
 	this.Data["IsLoginPage"] = true
 	this.TplNames = "auth/login.html"
@@ -63,7 +50,7 @@ func (this *LoginRouter) Login() {
 
 	var user models.User
 
-	form := models.LoginForm{}
+	form := models.LoginForm{Locale: this.Locale}
 	// valid form and put errors to template context
 	if this.ValidFormSets(&form) == false {
 		if this.IsAjax() {
@@ -72,10 +59,10 @@ func (this *LoginRouter) Login() {
 		return
 	}
 
-	if models.VerifyUser(&user, form.UserName, form.Password) {
+	if models.VerifyUser(&user, form.Email, form.Password) {
 		loginRedirect := strings.TrimSpace(this.Ctx.GetCookie("login_to"))
 		if utils.IsMatchHost(loginRedirect) == false {
-			loginRedirect = "/"
+			loginRedirect = "/home"
 		} else {
 			this.Ctx.SetCookie("login_to", "", -1, "/")
 		}
@@ -138,6 +125,7 @@ func (this *RegisterRouter) Get() {
 
 	this.Data["IsRegister"] = true
 	this.TplNames = "auth/register.html"
+	this.SetPageTitleFromKey("pagetitles.user_register")
 
 	form := models.RegisterForm{Locale: this.Locale}
 	this.SetFormSets(&form)
@@ -161,10 +149,6 @@ func (this *RegisterRouter) Register() {
 
 	// Create new user.
 	user := new(models.User)
-
-	// set default Lang
-	user.Lang = this.Locale.Index()
-
 	if err := models.RegisterUser(user, form); err == nil {
 		models.SendRegisterMail(this.Locale, user)
 
@@ -183,6 +167,7 @@ func (this *RegisterRouter) Register() {
 // Active implemented check Email actice code.
 func (this *RegisterRouter) Active() {
 	this.TplNames = "auth/active.html"
+	this.SetPageTitleFromKey("pagetitles.user_activate_email")
 
 	// no need active
 	if this.CheckActiveRedirect(false) {
@@ -194,9 +179,9 @@ func (this *RegisterRouter) Active() {
 	var user models.User
 
 	if models.VerifyUserActiveCode(&user, code) {
-		user.IsActive = true
+		user.IsActivated = true
 		user.Rands = models.GetUserSalt()
-		if err := user.Update("IsActive", "Rands", "Updated"); err != nil {
+		if err := user.Update("IsActivated", "Rands", "Updated"); err != nil {
 			beego.Error("Active: user Update ", err)
 		}
 		if this.isLogin {
@@ -213,6 +198,7 @@ func (this *RegisterRouter) Active() {
 // ActiveSuccess implemented success page when email active code verified.
 func (this *RegisterRouter) ActiveSuccess() {
 	this.TplNames = "auth/active.html"
+	this.SetPageTitleFromKey("pagetitles.user_activate_success")
 
 	this.Data["Success"] = true
 }
@@ -225,13 +211,14 @@ type ForgotRouter struct {
 // Get implemented Get method for ForgotRouter.
 func (this *ForgotRouter) Get() {
 	this.TplNames = "auth/forgot.html"
+	this.SetPageTitleFromKey("pagetitles.user_forgot_password")
 
 	// no need login
 	if this.CheckLoginRedirect(false) {
 		return
 	}
 
-	form := models.ForgotForm{}
+	form := models.ForgotForm{Locale: this.Locale}
 	this.SetFormSets(&form)
 }
 
@@ -245,7 +232,7 @@ func (this *ForgotRouter) Post() {
 	}
 
 	var user models.User
-	form := models.ForgotForm{User: &user}
+	form := models.ForgotForm{Locale: this.Locale, User: &user}
 	// valid form and put errors to template context
 	if this.ValidFormSets(&form) == false {
 		return
@@ -260,6 +247,7 @@ func (this *ForgotRouter) Post() {
 // Reset implemented user password reset.
 func (this *ForgotRouter) Reset() {
 	this.TplNames = "auth/reset.html"
+	this.SetPageTitleFromKey("pagetitles.user_reset_password")
 
 	code := this.GetString(":code")
 	this.Data["Code"] = code
@@ -268,7 +256,7 @@ func (this *ForgotRouter) Reset() {
 
 	if models.VerifyUserResetPwdCode(&user, code) {
 		this.Data["Success"] = true
-		form := models.ResetPwdForm{}
+		form := models.ResetPwdForm{Locale: this.Locale}
 		this.SetFormSets(&form)
 	} else {
 		this.Data["Success"] = false
@@ -287,12 +275,12 @@ func (this *ForgotRouter) ResetPost() {
 	if models.VerifyUserResetPwdCode(&user, code) {
 		this.Data["Success"] = true
 
-		form := models.ResetPwdForm{}
+		form := models.ResetPwdForm{Locale: this.Locale}
 		if this.ValidFormSets(&form) == false {
 			return
 		}
 
-		user.IsActive = true
+		user.IsActivated = true
 		if err := models.SaveNewPassword(&user, form.Password); err != nil {
 			beego.Error("ResetPost Save New Password: ", err)
 		}

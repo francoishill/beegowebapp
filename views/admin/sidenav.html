@@ -2,13 +2,14 @@
     <div class="cell first">
         <h4>{{i18n .Lang "admin.admin_center"}}</h4>
     </div>
-    <ul class="nav nav-side">
+    <ul class="nav nav-stacked nav-pills">
         <li{{if .consoleAdmin}} class="active"{{end}}>
             <a href="{{.AppUrl}}admin">{{i18n .Lang "admin.admin_console"}}</a>
         </li>
         <li{{if .userAdmin}} class="active"{{end}}>
             <a href="{{.AppUrl}}admin/user">{{i18n .Lang "model.admin_user"}}</a>
         </li>
+        {{/*
         <li{{if .postAdmin}} class="active"{{end}}>
             <a href="{{.AppUrl}}admin/post">{{i18n .Lang "model.admin_post"}}</a>
         </li>
@@ -21,8 +22,6 @@
         <li{{if .categoryAdmin}} class="active"{{end}}>
             <a href="{{.AppUrl}}admin/category">{{i18n .Lang "model.admin_category"}}</a>
         </li>
-        <li{{if .articleAdmin}} class="active"{{end}}>
-            <a href="{{.AppUrl}}admin/article">{{i18n .Lang "model.admin_article"}}</a>
-        </li>
+        */}}
     </ul>
 </div>

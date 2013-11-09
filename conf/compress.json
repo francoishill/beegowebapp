@@ -1,78 +1,82 @@
 {
-    "Js": {
-        "SrcPath": "static_source/js",
-        "DistPath": "static/js",
-        "SrcURL": "static_source/js",
-        "DistURL": "static/js",
-        "Groups": {
-            "lib": {
-                "DistFile": "lib.min.js",
-                "SourceFiles": [
-                    "jquery.min.js",
-                    "jquery.extend.js",
-                    "bootstrap.js",
-                    "lib.min.js",
-                    "prettify.js",
-                    "jStorage.js"
+	"Js": {
+		"SrcPath": "static_source/js",
+		"DistPath": "static/js",
+		"SrcURL": "static_source/js",
+		"DistURL": "static/js",
+		"Groups": {
+			"lib": {
+				"DistFile": "lib.min.js",
+				"SourceFiles": [
+                    "AngularJS/1.2.0rc1/angular.min.js",
+                    "bootstrap/ui-bootstrap-tpls-0.6.0.min.js",
+                    "jquery/1.10.2/jquery.min.js",
+                    "lib.min.js"
                 ],
-                "SkipFiles": [
-                    "jquery.min.js",
-                    "lib.min.js",
-                    "prettify.js"
+				"SkipFiles": [
+                    "AngularJS/1.2.0rc1/angular.min.js",
+                    "bootstrap/ui-bootstrap-tpls-0.6.0.min.js",
+                    "jquery/1.10.2/jquery.min.js",
+                    "lib.min.js"
                 ]
-            },
-            "app": {
-                "DistFile": "app.min.js",
-                "SourceFiles": [
-                    "main.js",
-                    "editor.js"
+			},
+			"app": {
+				"DistFile": "app.min.js",
+				"SourceFiles": [
+                    "main.js"
                 ]
-            },
-            "admin": {
-                "DistFile": "admin.min.js",
-                "SourceFiles": [
+			},
+			"admin": {
+				"DistFile": "admin.min.js",
+				"SourceFiles": [
                     "admin.js"
                 ]
-            }
-        }
-    },
-    "Css": {
-        "SrcPath": "static_source/css",
-        "DistPath": "static/css",
-        "SrcURL": "static_source/css",
-        "DistURL": "static/css",
-        "Groups": {
-            "lib": {
-                "DistFile": "lib.min.css",
-                "SourceFiles": [
-                    "bootstrap.css",
+			}
+		}
+	},
+	"Css": {
+		"SrcPath": "static_source/css",
+		"DistPath": "static/css",
+		"SrcURL": "static_source/css",
+		"DistURL": "static/css",
+		"Groups": {
+			"lib": {
+				"DistFile": "lib.min.css",
+				"SourceFiles": [
+                    "bootstrap/scss2.2.2/bootstrap.css",
+                    "bootstrap/scss2.2.2/responsive.css",
+                    "bootstrap3ported.css",
+					"bootstrap-theme.css",
+					"font-awesome.min.css",
+                    "select2.css",
+                    "overrides.css"
+                ],
+				"SkipFiles": [
+                    "bootstrap/scss2.2.2/bootstrap.css",
+                    "bootstrap/scss2.2.2/responsive.css",
+                    "bootstrap3ported.css",
                     "bootstrap-theme.css",
-                    "font-awesome.min.css",
-                    "prettify.css",
-                    "select2.css"
-                ],
-                "SkipFiles": [
-                    "font-awesome.min.css",
+                    "bootstrap-font-awesome.min.css",
                     "select2.css"
                 ]
-            },
-            "ie7": {
-                "Name": "ie7",
-                "DistFile": "ie7.min.css",
-                "SourceFiles": [
+			},
+			"ie7": {
+				"Name": "ie7",
+				"DistFile": "ie7.min.css",
+				"SourceFiles": [
                     "font-awesome-ie7.min.css"
                 ],
-                "SkipFiles": [
+				"SkipFiles": [
                     "font-awesome-ie7.min.css"
                 ]
-            },
-            "app": {
-                "Name": "app",
-                "DistFile": "app.min.css",
-                "SourceFiles": [
+			},
+			"app": {
+				"Name": "app",
+				"DistFile": "app.min.css",
+				"SourceFiles": [
                     "main.css"
                 ]
-            }
-        }
-    }
+			}
+		}
+	}
 }

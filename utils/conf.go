@@ -1,21 +1,8 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 // Package utils implemented some useful functions.
 package utils
 
 import (
+	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -30,11 +17,14 @@ import (
 	"github.com/beego/compress"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/mailer"
+	//"strconv"
+	"time"
+
+	"./../mailer"
 )
 
 const (
-	APP_VER = "0.0.9.1030"
+	APP_VER = "0.0.1.0000"
 )
 
 var (
@@ -45,40 +35,31 @@ var (
 	AppHost             string
 	AppUrl              string
 	AppLogo             string
-	EnforceRedirect     bool
 	AvatarURL           string
 	SecretKey           string
 	IsProMode           bool
 	MailUser            string
 	MailFrom            string
-	ActiveCodeLives     int
+	ActivationCodeLives int
 	ResetPwdCodeLives   int
-	LoginRememberDays   int
-	DateFormat          string
-	DateTimeFormat      string
-	DateTimeShortFormat string
-	RealtimeRenderMD    bool
-	ImageSizeSmall      int
-	ImageSizeMiddle     int
-	ImageLinkAlphabets  []byte
-	ImageXSend          bool
-	ImageXSendHeader    string
+	//LoginRememberDays   int
+	DateFormat     string
+	DateTimeFormat string
+	//RealtimeRenderMD bool
+	CompressSettings *compress.Settings
 	Langs               []string
 )
 
-const (
-	LangEnUS = iota
-	LangZhCN
+var (
+	Cfg_General         *goconfig.ConfigFile
+	Cfg_MachineSpecific *goconfig.ConfigFile
+	Cache               cache.Cache
 )
 
 var (
-	Cfg   *goconfig.ConfigFile
-	Cache cache.Cache
-)
-
-var (
-	AppConfPath      = "conf/app.ini"
-	CompressConfPath = "conf/compress.json"
+	AppConfPath                 = "conf/app_general.ini"
+	AppConfPath_MachineSpecific = "conf/app_machine_specific.ini"
+	CompressConfPath            = "conf/compress.json"
 )
 
 // LoadConfig loads configuration file.
@@ -88,23 +69,35 @@ func LoadConfig() *goconfig.ConfigFile {
 	if fh, _ := os.OpenFile(AppConfPath, os.O_RDONLY|os.O_CREATE, 0600); fh != nil {
 		fh.Close()
 	}
+	if fh, _ := os.OpenFile(AppConfPath_MachineSpecific, os.O_RDONLY|os.O_CREATE, 0600); fh != nil {
+		fh.Close()
+	}
 
 	// Load configuration, set app version and log level.
-	Cfg, err = goconfig.LoadConfigFile(AppConfPath)
-	Cfg.BlockMode = false
+	Cfg_General, err = goconfig.LoadConfigFile(AppConfPath)
+	Cfg_General.BlockMode = false
 	if err != nil {
-		panic("Fail to load configuration file: " + err.Error())
+		panic("Failed to load configuration (general) file: " + err.Error())
+	}
+
+	Cfg_MachineSpecific, err = goconfig.LoadConfigFile(AppConfPath_MachineSpecific)
+	Cfg_MachineSpecific.BlockMode = false
+	if err != nil {
+		panic("Failed to load configuration (machine specific) file: " + err.Error())
 	}
 
 	// Trim 4th part.
 	AppVer = strings.Join(strings.Split(APP_VER, ".")[:3], ".")
 
-	beego.RunMode = Cfg.MustValue("app", "run_mode")
-	beego.HttpPort = Cfg.MustInt("app", "http_port")
+	configWatcher()
+	reloadConfig()
+	reloadConfig_MachineSpecific()
 
 	IsProMode = beego.RunMode == "pro"
 	if IsProMode {
 		beego.SetLevel(beego.LevelInfo)
+	} else {
+		beego.SetLevel(beego.LevelDebug)
 	}
 
 	// cache system
@@ -112,101 +105,97 @@ func LoadConfig() *goconfig.ConfigFile {
 
 	// session settings
 	beego.SessionOn = true
-	beego.SessionProvider = Cfg.MustValue("session", "session_provider")
-	beego.SessionSavePath = Cfg.MustValue("session", "session_path")
-	beego.SessionName = Cfg.MustValue("session", "session_name")
+	beego.SessionProvider = Cfg_General.MustValue("app", "session_provider")
+	beego.SessionSavePath = Cfg_General.MustValue("app", "session_path")
+	beego.SessionName = Cfg_General.MustValue("app", "session_name")
 
 	beego.EnableXSRF = true
 	// xsrf token expire time
 	beego.XSRFExpire = 86400 * 365
 
-	driverName := Cfg.MustValue("orm", "driver_name")
-	dataSource := Cfg.MustValue("orm", "data_source")
-	maxIdle := Cfg.MustInt("orm", "max_idle_conn")
-	maxOpen := Cfg.MustInt("orm", "max_open_conn")
+	driverName := Cfg_General.MustValue("orm", "driver_name")
+	dataSource := Cfg_General.MustValue("orm", "data_source")
+	maxIdle := Cfg_General.MustInt("orm", "max_idle_conn")
+	maxOpen := Cfg_General.MustInt("orm", "max_open_conn")
+
+	orm.DefaultTimeLoc = time.UTC
 
 	// set default database
 	orm.RegisterDataBase("default", driverName, dataSource, maxIdle, maxOpen)
 	orm.RunCommand()
 
+	/*Rather call via commandline, for help call: ./main orm syncdb -h
+	Refer to: http://beego.me/docs/Models_Cmd
 	err = orm.RunSyncdb("default", false, false)
 	if err != nil {
 		beego.Error(err)
-	}
-
-	configWatcher()
-	reloadConfig()
+	}*/
 
 	settingLocales()
 	settingCompress()
 
-	return Cfg
+	return Cfg_General
 }
 
 func reloadConfig() {
-	AppName = Cfg.MustValue("app", "app_name")
+	AppName = Cfg_General.MustValue("app", "app_name")
 	beego.AppName = AppName
 
-	AppHost = Cfg.MustValue("app", "app_host")
-	AppUrl = Cfg.MustValue("app", "app_url")
-	AppLogo = Cfg.MustValue("app", "app_logo")
-	AppDescription = Cfg.MustValue("app", "description")
-	AppKeywords = Cfg.MustValue("app", "keywords")
-	AvatarURL = Cfg.MustValue("app", "avatar_url")
+	AppLogo = Cfg_General.MustValue("app", "app_logo")
+	AppDescription = Cfg_General.MustValue("app", "description")
+	AppKeywords = Cfg_General.MustValue("app", "keywords")
+	AvatarURL = Cfg_General.MustValue("app", "avatar_url")
+	DateFormat = Cfg_General.MustValue("app", "date_format")
+	DateTimeFormat = Cfg_General.MustValue("app", "datetime_format")
 
-	EnforceRedirect = Cfg.MustBool("app", "enforce_redirect")
+	MailUser = Cfg_General.MustValue("app", "mail_user")
+	MailFrom = Cfg_General.MustValue("app", "mail_from")
 
-	DateFormat = Cfg.MustValue("app", "date_format")
-	DateTimeFormat = Cfg.MustValue("app", "datetime_format")
-	DateTimeShortFormat = Cfg.MustValue("app", "datetime_short_format")
+	SecretKey = Cfg_General.MustValue("app", "secret_key")
+	ActivationCodeLives = Cfg_General.MustInt("app", "activation_code_live_days")
+	ResetPwdCodeLives = Cfg_General.MustInt("app", "resetpwd_code_live_days")
+	//LoginRememberDays = Cfg_General.MustInt("app", "login_remember_days")
+	//RealtimeRenderMD = Cfg_General.MustBool("app", "realtime_render_markdown")
+}
 
-	SecretKey = Cfg.MustValue("app", "secret_key")
-	ActiveCodeLives = Cfg.MustInt("app", "acitve_code_live_days")
-	ResetPwdCodeLives = Cfg.MustInt("app", "resetpwd_code_live_days")
-	LoginRememberDays = Cfg.MustInt("app", "login_remember_days")
-	RealtimeRenderMD = Cfg.MustBool("app", "realtime_render_markdown")
+func reloadConfig_MachineSpecific() {
+	beego.RunMode = Cfg_MachineSpecific.MustValue("beego", "run_mode")
+	beego.HttpPort = Cfg_MachineSpecific.MustInt("beego", "http_port_"+beego.RunMode)
 
-	ImageSizeSmall = Cfg.MustInt("image", "image_size_small")
-	ImageSizeMiddle = Cfg.MustInt("image", "image_size_middle")
+	AppHost = Cfg_MachineSpecific.MustValue("app", "app_host_"+beego.RunMode)
+	AppUrl = Cfg_MachineSpecific.MustValue("app", "app_url_"+beego.RunMode)
 
-	if ImageSizeSmall <= 0 {
-		ImageSizeSmall = 300
-	}
-
-	if ImageSizeMiddle <= ImageSizeSmall {
-		ImageSizeMiddle = ImageSizeSmall + 400
-	}
-
-	str := Cfg.MustValue("image", "image_link_alphabets")
-	if len(str) == 0 {
-		str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	}
-	ImageLinkAlphabets = []byte(str)
-
-	ImageXSend = Cfg.MustBool("image", "image_xsend")
-	ImageXSendHeader = Cfg.MustValue("image", "image_xsend_header")
-
-	MailUser = Cfg.MustValue("mailer", "mail_user")
-	MailFrom = Cfg.MustValue("mailer", "mail_from")
+	beego.EnableGzip = Cfg_MachineSpecific.MustBool("app", "app_enable_gzip")
 
 	// set mailer connect args
-	mailer.MailHost = Cfg.MustValue("mailer", "mail_host")
-	mailer.AuthUser = Cfg.MustValue("mailer", "mail_user")
-	mailer.AuthPass = Cfg.MustValue("mailer", "mail_pass")
+	mailer.MailHost = Cfg_MachineSpecific.MustValue("mailer", "host")
+	mailer.AuthUser = Cfg_MachineSpecific.MustValue("mailer", "user")
+	mailer.AuthPass = Cfg_MachineSpecific.MustValue("mailer", "pass")
 
-	orm.Debug = Cfg.MustBool("orm", "debug_log")
+	orm.Debug = Cfg_MachineSpecific.MustBool("orm", "debug_log")
 }
 
 func settingLocales() {
-	// load locales with locale_LANG.ini files
-	langs := "en-US|zh-CN"
-	for _, lang := range strings.Split(langs, "|") {
-		lang = strings.TrimSpace(lang)
-		if err := i18n.SetMessage(lang, "conf/"+"locale_"+lang+".ini"); err != nil {
-			beego.Error("Fail to set message file: " + err.Error())
-			os.Exit(2)
+	// autoload locales with locale_LANG.ini files
+	dirs, _ := ioutil.ReadDir("conf")
+	for _, info := range dirs {
+		if !info.IsDir() {
+			name := info.Name()
+			if filepath.HasPrefix(name, "locale_") {
+				if filepath.Ext(name) == ".ini" {
+					lang := name[7 : len(name)-4]
+					if len(lang) > 0 {
+						if err := i18n.SetMessage(lang, "conf/"+name); err != nil {
+							panic("Fail to set message file: " + err.Error())
+						}
+						continue
+					}
+				}
+				beego.Error("locale ", name, " not loaded")
+			}
 		}
 	}
+
 	Langs = i18n.ListLangs()
 }
 
@@ -241,8 +230,12 @@ func configWatcher() {
 				case ".ini":
 					beego.Info(event)
 
-					if err := Cfg.Reload(); err != nil {
-						beego.Error("Conf Reload: ", err)
+					if err := Cfg_General.Reload(); err != nil {
+						beego.Error("Conf general reload: ", err)
+					}
+
+					if err := Cfg_MachineSpecific.Reload(); err != nil {
+						beego.Error("Conf machine specific reload: ", err)
 					}
 
 					if err := i18n.ReloadLangs(); err != nil {
@@ -250,6 +243,7 @@ func configWatcher() {
 					}
 
 					reloadConfig()
+					reloadConfig_MachineSpecific()
 					beego.Info("Config Reloaded")
 
 				case ".json":

@@ -1,20 +1,6 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
 package utils
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/rand"
@@ -23,41 +9,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash"
-	"math/big"
 	"reflect"
 	"strconv"
 	"time"
 
 	"github.com/astaxie/beego"
 )
-
-func NumberEncode(number string, alphabet []byte) string {
-	token := make([]byte, 0, 12)
-	x, ok := new(big.Int).SetString(number, 10)
-	if !ok {
-		return ""
-	}
-	y := big.NewInt(int64(len(alphabet)))
-	m := new(big.Int)
-	for x.Sign() > 0 {
-		x, m = x.DivMod(x, y, m)
-		token = append(token, alphabet[int(m.Int64())])
-	}
-	return string(token)
-}
-
-func NumberDecode(token string, alphabet []byte) string {
-	x := new(big.Int)
-	y := big.NewInt(int64(len(alphabet)))
-	z := new(big.Int)
-	for i := len(token) - 1; i >= 0; i-- {
-		v := bytes.IndexByte(alphabet, token[i])
-		z.SetInt64(int64(v))
-		x.Mul(x, y)
-		x.Add(x, z)
-	}
-	return x.String()
-}
 
 // Random generate string
 func GetRandomString(n int) string {
@@ -70,7 +27,16 @@ func GetRandomString(n int) string {
 	return string(bytes)
 }
 
-// http://code.google.com/p/go/source/browse/pbkdf2/pbkdf2.go?repo=crypto
+func GetPaddedUserIdString(userId int64, requiredLength int) string {
+	userIdString := fmt.Sprint(userId)
+	padLen := requiredLength - len(userIdString)
+	for i := 0; i < padLen; i++ {
+		userIdString = "0" + userIdString
+	}
+	return userIdString
+}
+
+// This code was copied from: http://code.google.com/p/go/source/browse/pbkdf2/pbkdf2.go?repo=crypto
 func PBKDF2(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
 	prf := hmac.New(h, password)
 	hashLen := prf.Size()

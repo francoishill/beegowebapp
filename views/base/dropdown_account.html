@@ -1,0 +1,14 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    {{.User.Email}}
+    <b class="caret"></b>
+  </a>
+  <ul class="dropdown-menu">
+    {{if .User.IsAdmin}}
+    <li><a href="{{.AppUrl}}admin">{{i18n .Lang "admin.admin_center"}}</a></li>
+    <li class="divider"></li>
+    {{end}}
+    <li><a href="{{.AppUrl}}settings/profile">{{i18n .Lang "auth.user_profile"}} <i class="icon-cog pull-right"></i></a></li>
+    <li><a href="{{.AppUrl}}logout">{{i18n .Lang "auth.logout"}} <i class="icon-signout pull-right"></i></a></li>
+  </ul>
+</li>

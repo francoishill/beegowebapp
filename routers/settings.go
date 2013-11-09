@@ -1,23 +1,9 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 package routers
 
 import (
 	"github.com/astaxie/beego"
 
-	"github.com/beego/wetalk/models"
+	"./../models"
 )
 
 // SettingsRouter serves user settings.
@@ -38,7 +24,7 @@ func (this *SettingsRouter) Profile() {
 	form.SetFromUser(&this.user)
 	this.SetFormSets(&form)
 
-	formPwd := models.PasswordForm{}
+	formPwd := models.PasswordForm{Locale: this.Locale}
 	this.SetFormSets(&formPwd)
 }
 
@@ -55,7 +41,7 @@ func (this *SettingsRouter) ProfileSave() {
 	if this.IsAjax() {
 		switch action {
 		case "send-verify-email":
-			if this.user.IsActive {
+			if this.user.IsActivated {
 				this.Data["json"] = false
 			} else {
 				models.SendActiveMail(this.Locale, &this.user)
@@ -71,7 +57,7 @@ func (this *SettingsRouter) ProfileSave() {
 	profileForm := models.ProfileForm{Locale: this.Locale}
 	profileForm.SetFromUser(&this.user)
 
-	pwdForm := models.PasswordForm{User: &this.user}
+	pwdForm := models.PasswordForm{Locale: this.Locale}
 
 	this.Data["Form"] = profileForm
 
@@ -87,12 +73,16 @@ func (this *SettingsRouter) ProfileSave() {
 
 	case "change-password":
 		if this.ValidFormSets(&pwdForm) {
-			// verify success and save new password
-			if err := models.SaveNewPassword(&this.user, pwdForm.Password); err == nil {
-				this.FlashRedirect("/settings/profile", 302, "PasswordSave")
-				return
+			if models.VerifyPassword(pwdForm.PasswordOld, this.user.Password) {
+				// verify success and save new password
+				if err := models.SaveNewPassword(&this.user, pwdForm.Password); err == nil {
+					this.FlashRedirect("/settings/profile", 302, "PasswordSave")
+					return
+				} else {
+					beego.Error("ProfileSave: change-password", err)
+				}
 			} else {
-				beego.Error("ProfileSave: change-password", err)
+				this.SetFormError(&pwdForm, "PasswordOld", "Your old password not correct")
 			}
 		}
 

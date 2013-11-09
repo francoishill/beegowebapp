@@ -1,24 +1,16 @@
-{{template "base/base.html" .}}
-{{template "base/base_common.html" .}}
-{{define "meta"}}<title>{{i18n .Lang "auth.user_profile"}} - {{i18n .Lang "app_name"}}</title>{{end}}
-{{define "body"}}
 <div class="row">
     <div id="content">
-        <div class="col-md-3">
-            <div class="box">
-                <ul class="nav nav-side">
-                    <li class="cell first">
-                        <h4 class="head"><i class="icon icon-cogs"></i> {{i18n .Lang "auth.user_settings"}}</h4>
-                    </li>
-                    <li class="active">
-                        <a href="{{.AppUrl}}settings/profile">{{i18n .Lang "auth.user_profile"}}</a>
-                    </li>
-                    <li class="cell last">
-                    </li>
-                </ul>
+        <div class="span3">
+        	<div class="box">
+        		<div class="cell first breadcrumb">
+        		</div>
+        		<div class="cell last">
+        			<div class="container">
+        			</div>
+    			</div>
             </div>
     	</div>
-        <div class="col-md-9">
+        <div class="span9">
             <div class="box">
                 <div class="cell first breadcrumb">
                     <a href="{{.AppUrl}}"><i class="icon icon-home"></i></a><i class="divider icon-angle-right"></i><a href="">{{i18n .Lang "auth.user_profile"}}</a>
@@ -26,7 +18,7 @@
                 <div class="cell last slim">
                     {{if .flash.NeedActive}}
                     <div class="alert alert-info">
-                        <h4>{{i18n .Lang "auth.active_need"}}</h4>
+                        <h4>{{i18n .Lang "auth.need_active"}}</h4>
                         {{i18n .Lang "auth.need_active_message"}}
                     </div>
                     {{end}}
@@ -51,27 +43,27 @@
                         {{.xsrf_html}}{{.once_html}}
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="span6">
                                 <div class="form-group">
-                                    <label for="profile-username">{{i18n .Lang "model.user_username"}}</label>
-                                    <input id="profile-username" value="{{.User.UserName}}" type="text" class="form-control" disabled>
+                                    <label for="profile-username">{{i18n .Lang "model.user_email"}}</label>
+                                    <input id="profile-username" value="{{.User.Email}}" type="text" class="form-control" disabled>
                                 </div>
                             </div>
- 
-                            <div class="col-md-6">
+
+                            <div class="span6">
                                 {{template "base/form/field_group.html" .ProfileFormSets.Fields.NickName}}
                             </div>
                         </div>
- 
+
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="span6">
                                 {{with .ProfileFormSets.Fields.Email}}
-                                <div class="form-group{{if .Error}} has-error{{end}}{{if not $.User.IsActive}} has-warning{{end}}">
+                                <div class="form-group{{if .Error}} has-error{{end}}{{if not $.User.IsActivated}} has-warning{{end}}">
                                     {{.Label}}
                                     {{.Field}}
                                     <p class="error-block">
                                         {{if .Error}}{{.Error}}{{else}}
-                                            {{if not $.User.IsActive}}{{i18n $.Lang "auth.please_verify_email"}}{{end}}
+                                            {{if not $.User.IsActivated}}{{i18n $.Lang "auth.please_verify_email"}}{{end}}
                                         {{end}}
                                     </p>
                                     {{if .Help}}<p class="help-block">{{.Help}}</p>{{end}}
@@ -80,20 +72,20 @@
 
                                 {{template "base/form/field_group.html" .ProfileFormSets.Fields.PublicEmail}}
 
-                                {{if .User.IsActive}}{{else}}
+                                {{if .User.IsActivated}}{{else}}
                                 <div class="form-group">
                                     <button id="verify-mail-send" type="button" data-loading-text="{{i18n .Lang "auth.verify_email_sended"}}" class="btn btn-warning btn-xs">{{i18n .Lang "auth.send_verify_email"}}</button>
                                 </div>
                                 {{end}}
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="span6">
                                 {{template "base/form/field_group.html" .ProfileFormSets.Fields.Url}}
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="span6">
                                 {{with .ProfileFormSets.Fields.GrEmail}}
                                 <div class="form-group{{if .Error}} has-error{{end}}">
                                     {{.Label}}
@@ -107,24 +99,15 @@
                                     {{if .Help}}<p class="help-block">{{.Help}}</p>{{end}}
                                 </div>
                                 {{end}}
-
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="span6">
                                 {{template "base/form/field_group.html" .ProfileFormSets.Fields.Info}}
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
-                                {{template "base/form/field_group.html" .ProfileFormSets.Fields.Lang}}
-
-                                {{template "base/form/field_group.html" .ProfileFormSets.Fields.LangAdds}}
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="span6">
                                 <div class="form-group">
                                     <input type="hidden" name="action" value="save-profile">
                                     <button type="submit" class="btn btn-primary">{{i18n .Lang "auth.save_profile"}}&nbsp;&nbsp;<i class="icon-chevron-sign-right"></i></button>
@@ -133,9 +116,9 @@
                         </div>
                     </form>
 
-                    <h3 class="underline">{{i18n .Lang "auth.reset_password"}}</h3>
+                    <h3 class="underline">Reset Password</h3>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="span6">
                             <form method="POST" action="{{.AppUrl}}settings/profile">
                                 {{.xsrf_html}}{{.once_html}}
 
@@ -164,4 +147,3 @@
         });
     })(jQuery);
 </script>
-{{end}}

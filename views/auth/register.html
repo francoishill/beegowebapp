@@ -1,16 +1,54 @@
-{{template "base/base.html" .}}
-{{template "base/base_common.html" .}}
-{{define "meta"}}<title>{{i18n .Lang "auth.register"}} - {{i18n .Lang "app_name"}}</title>{{end}}
-{{define "body"}}
+<div style="display:none;">
+    @if (Session::has('validation_errors'))
+    <div style="color:maroon;">Please correct the following before continuing:</div>
+    <ol>
+    @foreach (Session::get('validation_errors')->all('<li>:message</li>') as $err)
+        [@ $err @]
+    @endforeach
+    </ol>
+    <br/><br/>
+    @endif
+
+    @if (Session::has('register_errors'))
+    <div style="color:maroon;">Registration failed, please try again
+        @if (Session::has('exceptionMessage'))
+        : <span style="color:maroon;font-weight: bold">[@ Session::get('exceptionMessage') @]</span>
+        @endif
+    </div>
+    <br/>
+    @endif
+
+    [@ Form::open(array('url' => 'register', 'style' => 'display:inline;font-size:20px')) @]
+    [@ Form::label('emailaddress', 'Email Address'); @]<br/>
+    [@ Form::email('emailaddress', $value = NULL, $attributes = array('placeholder' => 'example@email.com', 'required', 'autofocus')); @]<br/>
+    <br/>
+    [@ Form::label('fullname', 'Full name'); @]<br/>
+    [@ Form::text('fullname', $value = NULL, $attributes = array('placeholder' => 'Enter your name here')); @]<br/>
+    <br/>
+    [@ Form::label('password', 'Password'); @]<br/>
+    [@ Form::password('password', array('placeholder' => 'Choose a password', 'required')); @]<br/>
+    <br/>
+    [@ Form::label('password_confirmation', 'Confirm password'); @]<br/>
+    [@ Form::password('password_confirmation', array('placeholder' => 'Confirm password', 'required')); @]<br/>
+    <br/>
+    [@ Form::captcha(array('theme' => 'clean')); @]<br/>
+    <br/>
+    [@ Form::submit('Register') @]
+    [@ Form::close() @]
+    @if (Session::has('url.intended'))
+    <span style="font-size:12px;color:#aaa">You will be redirected to <span style="font-weight:bold;">[@ Session::get('url.intended'); @]</span></span>
+    @endif
+</div>
+
 <div class="row">
-    <div id="content" class="col-md-8 col-md-offset-2">
+    <div id="content" class="span8 spanoffset-2">
     	<div class="box">
     		<div class="cell first breadcrumb">
     			<i class="ahead icon-home"></i> <a href="{{.AppUrl}}">{{i18n .Lang "app_name"}}</a>
     		</div>
     		<div class="cell last slim">
     			<div class="row">
-    				<div class="col-md-6 auth-page">
+    				<div class="span6 auth-page">
     					<h3 class="title">
     						<i class="icon icon-user"></i> {{i18n .Lang "auth.sign_up"}}
     					</h3>
@@ -23,7 +61,7 @@
     					</form>
     				</div>
 
-    				<div class="col-md-6 auth-page">
+    				<div class="span6 auth-page">
         				<div class="auth-page">
         					<h3 class="title">
         						<i class="icon icon-question"></i> {{i18n .Lang "help"}}
@@ -41,4 +79,3 @@
     	</div>
 	</div>
 </div>
-{{end}}

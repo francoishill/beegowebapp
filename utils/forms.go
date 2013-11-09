@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"html/template"
-	"math"
 	"net/url"
 	"reflect"
 	"strings"
@@ -94,7 +93,6 @@ type FieldSet struct {
 	Help        string
 	Error       string
 	Type        string
-	Kind        string
 	Placeholder string
 	Attrs       string
 }
@@ -220,16 +218,8 @@ outFor:
 		fSet.Id = fId
 		fSet.Name = fName
 		fSet.Value = value
+		fSet.Type = fTyp
 		fSet.Attrs = attrs
-
-		if i := strings.IndexRune(fTyp, ','); i != -1 {
-			fSet.Type = fTyp[:i]
-			fSet.Kind = fTyp[i+1:]
-			fTyp = fSet.Type
-		} else {
-			fSet.Type = fTyp
-			fSet.Kind = fTyp
-		}
 
 		// get field label text
 		fSet.LabelText = fName
@@ -274,21 +264,28 @@ outFor:
 		} else {
 			// create field html
 			switch fTyp {
-			case "text":
+			case "text",
+				"tel",
+				"email":
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<input id="%s" name="%s" type="text" value="%v" class="form-control"%s%s>`, fId, fName, value, placeholders, attrs))
+					`<div class="controls"><input id="%s" name="%s" type="%s" value="%v" class="form-control"%s%s></div>`,
+					fId, fName, fTyp, value, placeholders, attrs))
 
 			case "textarea":
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<textarea id="%s" name="%s" rows="5" class="form-control"%s%s>%v</textarea>`, fId, fName, placeholders, attrs, value))
+					`<div class="controls"><textarea id="%s" name="%s" rows="5" class="form-control"%s%s>%v</textarea></div>`,
+					fId, fName, placeholders, attrs, value))
 
 			case "password":
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<input id="%s" name="%s" type="password" value="%v" class="form-control"%s%s>`, fId, fName, value, placeholders, attrs))
+					`<div class="controls"><input id="%s" name="%s" type="password" value="%v" class="form-control"%s%s></div>`,
+					fId, fName, value, placeholders, attrs))
 
 			case "select":
 				var options string
-				str := fmt.Sprintf(`<select id="%s" name="%s" class="form-control"%s%s>%s</select>`, fId, fName, placeholders, attrs)
+				str := fmt.Sprintf(
+					`<div class="controls"><select id="%s" name="%s" class="form-control"%s%s>%s</select></div>`,
+					fId, fName, placeholders, attrs)
 				fun := elm.Addr().MethodByName(name + "SelectData")
 
 				if fun.IsValid() {
@@ -343,7 +340,8 @@ outFor:
 
 			case "hidden":
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<input id="%s" name="%s" type="hidden" value="%v"%s>`, fId, fName, value, attrs))
+					`<div class="controls"><input id="%s" name="%s" type="hidden" value="%v"%s></div>`,
+					fId, fName, value, attrs))
 
 			case "date", "datetime":
 				t := value.(time.Time)
@@ -355,7 +353,8 @@ outFor:
 					tval = beego.Date(t, DateFormat)
 				}
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<input id="%s" name="%s" type="%s" value="%s" class="form-control"%s%s>`, fId, fName, fTyp, tval, placeholders, attrs))
+					`<div class="controls"><input id="%s" name="%s" type="%s" value="%s" class="form-control"%s%s></div>`,
+					fId, fName, fTyp, tval, placeholders, attrs))
 
 			case "checkbox":
 				var checked string
@@ -363,7 +362,7 @@ outFor:
 					checked = "checked"
 				}
 				fSet.Field = template.HTML(fmt.Sprintf(
-					`<label for="%s" class="checkbox">%s<input id="%s" name="%s" type="checkbox" %s></label>`,
+					`<div class="controls"><label for="%s" class="checkbox">%s<input id="%s" name="%s" type="checkbox" %s></label></div>`,
 					fId, fSet.LabelText, fId, fName, checked))
 			}
 
@@ -498,47 +497,6 @@ outFor:
 			// set value if type matched
 			if f.Type().String() == toF.Type().String() {
 				toF.Set(f)
-			} else {
-				fInt := false
-				switch f.Interface().(type) {
-				case int, int8, int16, int32, int64:
-					fInt = true
-				case uint, uint8, uint16, uint32, uint64:
-				default:
-					continue outFor
-				}
-				switch toF.Interface().(type) {
-				case int, int8, int16, int32, int64:
-					var v int64
-					if fInt {
-						v = f.Int()
-					} else {
-						vu := f.Uint()
-						if vu > math.MaxInt64 {
-							continue outFor
-						}
-						v = int64(vu)
-					}
-					if toF.OverflowInt(v) {
-						continue outFor
-					}
-					toF.SetInt(v)
-				case uint, uint8, uint16, uint32, uint64:
-					var v uint64
-					if fInt {
-						vu := f.Int()
-						if vu < 0 {
-							continue outFor
-						}
-						v = uint64(vu)
-					} else {
-						v = f.Uint()
-					}
-					if toF.OverflowUint(v) {
-						continue outFor
-					}
-					toF.SetUint(v)
-				}
 			}
 		}
 	}

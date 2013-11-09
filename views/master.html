@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{{.PageTitle}}</title>
+	{{template "base/head.html" .}}
+</head>
+<body id="front" ng-controller="MainController">
+	{{template "base/top_overlay.html" .}}
+	<div id="wrapper">
+		{{template "base/navbar.html" .}}
+		<div id="main" class="container">
+			{{.LayoutContent}}
+		</div>
+		<div class="wrapper-push"></div>
+	</div>
+
+	<div ng-view=""></div>
+
+	<div id="scrollToTopButton" title="Scroll to top" scroll-position="currentScrollYPos" ng-init="currentScrollYPos = 0" ng-cloak="">
+		<div class="arrow-up" ng-hide="currentScrollYPos < 50" ng-click="scrollToTop()"></div>
+	</div>
+
+	{{template "base/foot.html" .}}
+
+	<script>
+		/*$(function(){
+			if (initialAjaxUrl){
+				$.ajax({
+					url:initialAjaxUrl,
+					cache:false
+				})
+				.done(function(){
+					alert('Done');
+				});
+			}
+		});*/
+    </script>
+</body>
+</html>

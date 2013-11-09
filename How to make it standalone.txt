@@ -1,0 +1,11 @@
+1. Copy the EXE with the "static" and "views" folders.
+2. Make sure the conf/app_general.ini has correct settings and DB settings
+3. Run db migration by calling: ???.exe orm syncdb -v=true >> migration.log
+4. Check the migration.log file to ensure it succeeded
+5. Create the sessions database and then create the required table with the following SQL:
+      CREATE TABLE `session` (
+        `session_key` char(64) NOT NULL,
+        `session_data` blob,
+        `session_expiry` int(11) unsigned NOT NULL,
+        PRIMARY KEY (`session_key`)
+      ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

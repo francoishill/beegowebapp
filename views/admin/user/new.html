@@ -4,10 +4,10 @@
 {{define "body"}}
 <div class="row">
     <div id="content">
-        <div class="col-md-2">
+        <div class="span2">
             {{template "admin/sidenav.html" .}}
         </div>
-        <div class="col-md-8">
+        <div class="span10">
             {{if .Error}}
             <div class="alert alert-danger">
                 {{.Error}}
@@ -19,10 +19,14 @@
                 </div>
                 <div class="cell last slim">
                     <form action="{{.AppUrl}}admin/user/new" method="POST">
-                        {{.xsrf_html}}{{.once_html}}
-                        {{template "admin/component/fields.html" dict "root" $ "FormSets" .UserAdminFormSets}}
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">{{i18n .Lang "save"}}&nbsp;&nbsp;<i class="icon-chevron-sign-right"></i></button>
+                        <div class="row">
+                            <div class="span6">
+                                {{.xsrf_html}}{{.once_html}}
+                                {{template "base/form/fields.html" .UserAdminFormSets}}
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">{{i18n .Lang "save"}}&nbsp;&nbsp;<i class="icon-chevron-sign-right"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                     <div class="clearfix"></div>

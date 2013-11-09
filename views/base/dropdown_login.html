@@ -1,0 +1,27 @@
+<li class="dropdown{{if .IsLoginPage}} active{{end}}">
+    <a href="{{.AppUrl}}login" class="dropdown-toggle" data-toggle="dropdown">
+        {{i18n .Lang "auth.login"}}
+        <b class="caret"></b>
+    </a>
+    <form id="dropdown-login" class="dropdown-menu cell" action="{{.AppUrl}}login" method="POST">
+        {{.xsrf_html}}{{.once_html}}
+        <div class="alert alert-info alert-small">
+            {{i18n .Lang "auth.login_your_account"}}
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="Email" type="text" placeholder="{{i18n .Lang "auth.login_email"}} / {{i18n .Lang "auth.login_email"}}" value="">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="Password" type="password" placeholder="{{i18n .Lang "auth.login_password"}}">
+        </div>
+        <p>
+            <span class="pull-right"><a href="{{.AppUrl}}forgot"><i class="icon-question-sign"></i> {{i18n .Lang "auth.forgot_password"}}</a></span>
+            <label>
+                <input type="hidden" name="Remember" value="0">
+                <button type="button" 
+                data-toggle="button" data-name="Remember" value="0" class="btn btn-default btn-xs btn-checked"><i class="icon icon-ok"></i></button>{{i18n .Lang "auth.login_remember_me"}}
+            </label>
+        </p>
+        <button class="btn btn-primary btn-block" type="submit">{{i18n .Lang "auth.login"}}</button>
+    </form>
+</li>

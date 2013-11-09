@@ -1,15 +1,17 @@
 {
-	"go_install": true,
-	"watch_ext": [],
+	"go_install": false,
+	"watch_ext": [
+		".ini"
+	],
 	"dir_structure":{
 		"controllers": "routers",
 		"models": "",
 		"others": [
-			"utils"
+			"conf", "utils"
 		]
 	},
 	"bale": {
-		"import": "github.com/beego/wetalk/bale",
+		"import": "./bale",
 		"dirs": [
 			"views", "static", "conf"
 		],

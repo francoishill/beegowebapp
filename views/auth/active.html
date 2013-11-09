@@ -3,7 +3,7 @@
 {{define "meta"}}<title>{{i18n .Lang "auth.active_user"}} - {{i18n .Lang "app_name"}}</title>{{end}}
 {{define "body"}}
 <div class="row">
-    <div id="content" class="col-md-8 col-md-offset-2">
+    <div id="content" class="span8 spanoffset-2">
     	<div class="box">
     		<div class="cell first breadcrumb">
     			<i class="ahead icon-home"></i> <a href="{{.AppUrl}}">{{i18n .Lang "app_name"}}</a>
@@ -11,7 +11,7 @@
 
     		<div class="cell last slim">
     			<div class="row">
-    				<div class="col-md-12">
+    				<div class="span12">
                         {{if .Success}}
                             <h3>{{i18n .Lang "auth.active_success"}}</h3>
                             <hr>

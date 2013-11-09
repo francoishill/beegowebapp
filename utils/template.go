@@ -1,25 +1,9 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 package utils
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"net/url"
 	"time"
 
@@ -47,10 +31,6 @@ func date(t time.Time) string {
 
 func datetime(t time.Time) string {
 	return beego.Date(t, DateTimeFormat)
-}
-
-func datetimes(t time.Time) string {
-	return beego.Date(t, DateTimeShortFormat)
 }
 
 func loadtimes(t time.Time) int {
@@ -85,17 +65,15 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
 
 func timesince(lang string, t time.Time) string {
 	now := time.Now()
-	seconds := int(now.Sub(t).Seconds())
-	if seconds < 60 {
-		return i18n.Tr(lang, "seconds_ago", seconds)
-	} else if seconds < 60*60 {
-		return i18n.Tr(lang, "minutes_ago", seconds/60)
-	} else if seconds < 60*60*24 {
-		return i18n.Tr(lang, "hours_ago", seconds/(60*60))
-	} else if seconds < 60*60*24*100 {
-		return i18n.Tr(lang, "days_ago", seconds/(60*60*24))
+	seonds := int(now.Sub(t).Seconds())
+	if seonds < 60 {
+		return i18n.Tr(lang, "seconds_ago", seonds)
+	} else if seonds < 60*60 {
+		return i18n.Tr(lang, "minutes_ago", seonds/60)
+	} else if seonds < 60*60*24 {
+		return i18n.Tr(lang, "hours_ago", seonds/(60*60))
 	} else {
-		return beego.Date(t, DateFormat)
+		return i18n.Tr(lang, "days_ago", seonds/(60*60*24))
 	}
 }
 
@@ -112,33 +90,24 @@ func loginto(uris ...string) template.HTMLAttr {
 	return template.HTMLAttr(to)
 }
 
+func generateInitialAjaxUrlVariable(initialUrl string) template.HTML {
+	return template.HTML(fmt.Sprintf(
+		`<script>
+			var initialAjaxUrl = '%s';
+		</script>`,
+		template.HTMLEscapeString(initialUrl)))
+}
+
 func init() {
 	// Register template functions.
 	beego.AddFuncMap("i18n", i18nHTML)
 	beego.AddFuncMap("boolicon", boolicon)
 	beego.AddFuncMap("date", date)
 	beego.AddFuncMap("datetime", datetime)
-	beego.AddFuncMap("datetimes", datetimes)
 	beego.AddFuncMap("dict", dict)
 	beego.AddFuncMap("timesince", timesince)
 	beego.AddFuncMap("loadtimes", loadtimes)
 	beego.AddFuncMap("sum", sum)
 	beego.AddFuncMap("loginto", loginto)
-}
-
-func RenderTemplate(TplNames string, Data map[interface{}]interface{}) string {
-	if beego.RunMode == "dev" {
-		beego.BuildTemplate(beego.ViewsPath)
-	}
-
-	ibytes := bytes.NewBufferString("")
-	if _, ok := beego.BeeTemplates[TplNames]; !ok {
-		panic("can't find templatefile in the path:" + TplNames)
-	}
-	err := beego.BeeTemplates[TplNames].ExecuteTemplate(ibytes, TplNames, Data)
-	if err != nil {
-		beego.Trace("template Execute err:", err)
-	}
-	icontent, _ := ioutil.ReadAll(ibytes)
-	return string(icontent)
+	beego.AddFuncMap("initajaxurl", generateInitialAjaxUrlVariable)
 }

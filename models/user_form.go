@@ -1,17 +1,3 @@
-// Copyright 2013 wetalk authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License"): you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 package models
 
 import (
@@ -20,12 +6,11 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/utils"
+	"./../utils"
 )
 
 // Register form
 type RegisterForm struct {
-	UserName   string      `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
 	Email      string      `valid:"Required;Email;MaxSize(80)"`
 	Password   string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
 	PasswordRe string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
@@ -40,20 +25,15 @@ func (form *RegisterForm) Valid(v *validation.Validation) {
 		return
 	}
 
-	e1, e2, _ := CanRegistered(form.UserName, form.Email)
+	e1, _ := CanRegistered(form.Email)
 
 	if !e1 {
-		v.SetError("UserName", "auth.username_already_taken")
-	}
-
-	if !e2 {
 		v.SetError("Email", "auth.email_already_taken")
 	}
 }
 
 func (form *RegisterForm) Labels() map[string]string {
 	return map[string]string{
-		"UserName":   "auth.login_username",
 		"Email":      "auth.login_email",
 		"Password":   "auth.login_password",
 		"PasswordRe": "auth.retype_password",
@@ -62,13 +42,12 @@ func (form *RegisterForm) Labels() map[string]string {
 
 func (form *RegisterForm) Helps() map[string]string {
 	return map[string]string{
-		"UserName": form.Locale.Tr("valid.min_length_is", 5) + ", " + form.Locale.Tr("valid.only_contains", "a-z 0-9 - _"),
+	//"Email": form.Locale.Tr("valid.min_length_is", 5) + ", " + form.Locale.Tr("valid.only_contains", "a-z 0-9 - _"),
 	}
 }
 
 func (form *RegisterForm) Placeholders() map[string]string {
 	return map[string]string{
-		"UserName":   "auth.plz_enter_username",
 		"Email":      "auth.plz_enter_email",
 		"Password":   "auth.plz_enter_password",
 		"PasswordRe": "auth.plz_reenter_password",
@@ -77,23 +56,33 @@ func (form *RegisterForm) Placeholders() map[string]string {
 
 // Login form
 type LoginForm struct {
-	UserName string `valid:"Required"`
+	Email    string `valid:"Required; Email; MaxSize(240)"`
 	Password string `form:"type(password)" valid:"Required"`
 	Remember bool
+	Locale   i18n.Locale `form:"-"`
 }
 
 func (form *LoginForm) Labels() map[string]string {
 	return map[string]string{
-		"UserName": "auth.username_or_email",
+		"Email":    "auth.email",
 		"Password": "auth.login_password",
 		"Remember": "auth.login_remember_me",
 	}
 }
 
+func (form *LoginForm) Valid(v *validation.Validation) {
+	valid := validation.Validation{}
+	valid.Email(form.Email, "email")
+	if valid.HasErrors() {
+		v.SetError("Email", form.Locale.Tr("valid.invalid_email"))
+	}
+}
+
 // Forgot form
 type ForgotForm struct {
-	Email string `valid:"Required;Email;MaxSize(80)"`
-	User  *User  `form:"-"`
+	Email  string      `valid:"Required;Email;MaxSize(80)"`
+	User   *User       `form:"-"`
+	Locale i18n.Locale `form:"-"`
 }
 
 func (form *ForgotForm) Labels() map[string]string {
@@ -116,8 +105,9 @@ func (form *ForgotForm) Valid(v *validation.Validation) {
 
 // Reset password form
 type ResetPwdForm struct {
-	Password   string `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	PasswordRe string `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	Password   string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	PasswordRe string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	Locale     i18n.Locale `form:"-"`
 }
 
 func (form *ResetPwdForm) Valid(v *validation.Validation) {
@@ -143,15 +133,15 @@ func (form *ResetPwdForm) Placeholders() map[string]string {
 
 // Settings Profile form
 type ProfileForm struct {
-	NickName    string           `valid:"Required;MaxSize(30)"`
-	Url         string           `valid:"MaxSize(100)"`
-	Info        string           `form:"type(textarea)" valid:"MaxSize(255)"`
-	Email       string           `valid:"Required;Email;MaxSize(100)"`
-	PublicEmail bool             `valid:""`
-	GrEmail     string           `valid:"Required;MaxSize(80)"`
+	NickName    string      `valid:"Required;MaxSize(30)"`
+	Url         string      `valid:"MaxSize(100)"`
+	Info        string      `form:"type(textarea)" valid:"MaxSize(255)"`
+	Email       string      `valid:"Required;Email;MaxSize(100)"`
+	PublicEmail bool        `valid:""`
+	GrEmail     string      `valid:"Required;MaxSize(80)"`
 	Lang        int              `form:"type(select);attr(rel,select2)" valid:""`
 	LangAdds    SliceStringField `form:"type(select);attr(rel,select2);attr(multiple,multiple)" valid:""`
-	Locale      i18n.Locale      `form:"-"`
+	Locale      i18n.Locale `form:"-"`
 }
 
 func (form *ProfileForm) LangSelectData() [][]string {
@@ -209,8 +199,8 @@ func (form *ProfileForm) SaveUserProfile(user *User) error {
 	if len(changes) > 0 {
 		// if email changed then need re-active
 		if user.Email != form.Email {
-			user.IsActive = false
-			changes = append(changes, "IsActive")
+			user.IsActivated = false
+			changes = append(changes, "IsActivated")
 		}
 
 		utils.SetFormValues(form, user)
@@ -239,18 +229,20 @@ func (form *ProfileForm) Helps() map[string]string {
 
 func (form *ProfileForm) Placeholders() map[string]string {
 	return map[string]string{
-		"GrEmail": "auth.plz_enter_gremail",
-		"Url":     "auth.plz_enter_website",
-		"Info":    "auth.plz_enter_your_info",
+		"NickName": "auth.plz_enter_nickname",
+		"GrEmail":  "auth.plz_enter_gremail",
+		"Url":      "auth.plz_enter_website",
+		"Info":     "auth.plz_enter_your_info",
 	}
 }
 
 // Change password form
 type PasswordForm struct {
-	PasswordOld string `form:"type(password)" valid:"Required"`
-	Password    string `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	PasswordRe  string `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	PasswordOld string      `form:"type(password)" valid:"Required"`
+	Password    string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	PasswordRe  string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
 	User        *User  `form:"-"`
+	Locale      i18n.Locale `form:"-"`
 }
 
 func (form *PasswordForm) Valid(v *validation.Validation) {
@@ -282,20 +274,19 @@ func (form *PasswordForm) Placeholders() map[string]string {
 }
 
 type UserAdminForm struct {
-	Create      bool             `form:"-"`
-	Id          int              `form:"-"`
-	UserName    string           `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
-	Email       string           `valid:"Required;Email;MaxSize(100)"`
-	PublicEmail bool             ``
-	NickName    string           `valid:"Required;MaxSize(30)"`
-	Url         string           `valid:"MaxSize(100)"`
-	Info        string           `form:"type(textarea)" valid:"MaxSize(255)"`
-	GrEmail     string           `valid:"Required;MaxSize(80)"`
-	Followers   int              ``
-	Following   int              ``
-	IsAdmin     bool             ``
-	IsActive    bool             ``
-	IsForbid    bool             ``
+	Create      bool   `form:"-"`
+	Id          int64  `form:"-"`
+	Email       string `valid:"Required;Email;MaxSize(100)"`
+	PublicEmail bool   ``
+	//NickName    string      `valid:"Required;MaxSize(30)"`
+	Url  string `valid:"MaxSize(100)"`
+	Info string `form:"type(textarea)" valid:"MaxSize(255)"`
+	//GrEmail   string      `valid:"Required;MaxSize(80)"`
+	Followers   int         ``
+	Following   int         ``
+	IsAdmin     bool        ``
+	IsActivated bool        ``
+	IsBanned    bool        ``
 	Lang        int              `form:"type(select);attr(rel,select2)" valid:""`
 	LangAdds    SliceStringField `form:"type(select);attr(rel,select2);attr(multiple,multiple)" valid:""`
 }
@@ -320,10 +311,6 @@ func (form *UserAdminForm) LangAddsSelectData() [][]string {
 
 func (form *UserAdminForm) Valid(v *validation.Validation) {
 	qs := Users()
-
-	if CheckIsExist(qs, "UserName", form.UserName, form.Id) {
-		v.SetError("UserName", "auth.username_already_taken")
-	}
 
 	if CheckIsExist(qs, "Email", form.Email, form.Id) {
 		v.SetError("Email", "auth.email_already_taken")
@@ -365,9 +352,9 @@ func (form *UserAdminForm) SetFromUser(user *User) {
 
 func (form *UserAdminForm) SetToUser(user *User) {
 	// set md5 value if the value is an email
-	if strings.IndexRune(form.GrEmail, '@') != -1 {
+	/*if strings.IndexRune(form.GrEmail, '@') != -1 {
 		form.GrEmail = utils.EncodeMd5(form.GrEmail)
-	}
+	}*/
 
 	utils.SetFormValues(form, user)
 }
