@@ -1,5 +1,9 @@
-What is this?
-=============
+Important to CLONE first
+========================
+After installing this code, do not edit any of it. Use the cloning tool provided here:
+[https://github.com/francoishill/clonebeegowebapp](https://github.com/francoishill/clonebeegowebapp).
+
+# What is this?
 
 An open source project to create a skeleton of a [Beego](https://github.com/astaxie/beego) website.
 
@@ -33,7 +37,7 @@ We have also included the following libraries into the design (they are laid out
 
 # Installation
 
-Here we will describe the steps to ge you up and running, note there are many dependencies which we will also help you to install.
+Here we will describe the steps to get you up and running. There are many dependencies which we will also help guide you to install.
 
 ```bash
 go get github.com/astaxie/beego
@@ -43,11 +47,9 @@ go get github.com/howeyc/fsnotify
 go get github.com/beego/compress
 go get github.com/go-sql-driver/mysql
 go get github.com/francoishill/beegowebapp
-cd $GOPATH/src/github.com/francoishill/beegowebapp
-./install.sh
 ```
 
-Now go and install the cloning tool:
+Now go and install the cloning tool and follow its instructions:
 [https://github.com/francoishill/clonebeegowebapp](https://github.com/francoishill/clonebeegowebapp).
 
 
