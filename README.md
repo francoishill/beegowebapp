@@ -38,17 +38,17 @@ We have also included the following libraries into the design (they are laid out
 
 # Installation
 
-0. #### Here are the dependencies to be installed.
+0. #### Dependencies to be installed
 
-```bash
-go get github.com/astaxie/beego
-go get github.com/Unknwon/goconfig
-go get github.com/beego/i18n
-go get github.com/howeyc/fsnotify
-go get github.com/beego/compress
-go get github.com/go-sql-driver/mysql
-go get github.com/francoishill/beegowebapp
-```
+    ```bash
+    go get github.com/astaxie/beego
+    go get github.com/Unknwon/goconfig
+    go get github.com/beego/i18n
+    go get github.com/howeyc/fsnotify
+    go get github.com/beego/compress
+    go get github.com/go-sql-driver/mysql
+    go get github.com/francoishill/beegowebapp
+    ```
 
 0. #### Now install the cloning tool
 
