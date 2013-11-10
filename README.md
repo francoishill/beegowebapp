@@ -1,7 +1,7 @@
 Important to CLONE first
 ========================
-After installing this code, do not edit any of it. Use the cloning tool provided here:
-[https://github.com/francoishill/clonebeegowebapp](https://github.com/francoishill/clonebeegowebapp).
+Do not edit this code directly, after installing it use the clone tool (clonebeegowebapp) as described in "Quick Start" below.
+
 
 # What is this?
 
