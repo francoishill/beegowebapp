@@ -128,12 +128,13 @@ func (d *newBlank) Run(s *Settings) error {
 		return errors.New("Missing paths, see log above") //Just for safety
 	}
 
+	/* DO NOT do git pull, maybe user does not desire to do this?
 	pullGitSuccess, err := pullGit()
 	if !pullGitSuccess {
 		fmt.Println("Error occurred with git pull: ", err.Error())
 		os.Exit(2)
 		return errors.New("Error occurred with git pull: " + err.Error()) //Just for safety
-	}
+	}*/
 
 	copySuccess, errsList := cloneAllFiles(curpath_destinationDir, d.folderName)
 	if !copySuccess {
