@@ -23,3 +23,25 @@ func (this *GeneralRouter) UserHome() {
 	this.TplNames = "user/home.html"
 	this.SetPageTitleFromKey("pagetitles.user_home")
 }
+
+func (this *GeneralRouter) Acknowledgements() {
+	this.TplNames = "public/acknowledgements.html"
+
+	this.SetPageTitleFromKey("pagetitles.public_acknowledgements")
+
+	type acknowledgement struct {
+		Name         string
+		Url          string
+		ExtraDetails string //Optional
+	}
+
+	listOfAcknowledgements := []acknowledgement{}
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Beego", Url: "https://github.com/astaxie/beego"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Wetalk", Url: "https://github.com/beego/wetalk", ExtraDetails: "Built on Beego"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Angular JS", Url: "http://angularjs.org/"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Bootstrap", Url: "http://getbootstrap.com"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Jquery", Url: "http://jquery.com/"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Sass", Url: "http://sass-lang.com/"})
+
+	this.Data["AcknowledgementsList"] = listOfAcknowledgements
+}

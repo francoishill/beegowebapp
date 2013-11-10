@@ -36,6 +36,7 @@ func main() {
 	general := new(routers.GeneralRouter)
 	beego.Router("/", general, "get:PublicHome")
 	beego.Router("/home", general, "get:UserHome")
+	beego.Router("/acknowledgements", general, "get:Acknowledgements")
 
 	user := new(routers.UserRouter)
 	beego.Router("/u/:email", user, "get:Home")

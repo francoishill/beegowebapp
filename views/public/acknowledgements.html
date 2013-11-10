@@ -1,0 +1,5 @@
+<ul>
+	{{range $ackn := .AcknowledgementsList}}
+	<li><a href="{{$ackn.Url}}">{{$ackn.Name}}</a> {{if $ackn.ExtraDetails}} - {{$ackn.ExtraDetails}}{{end}}</li>
+	{{end}}
+</ul>
