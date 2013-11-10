@@ -75,7 +75,7 @@ We have also included the following libraries into the design (they are laid out
 
     ```bash
     cd /temp
-    clonebeegowebapp blank "myfirstapp"
+    clonebeegowebapp blank --foldername="myfirstapp"
     ```
     
 0. #### Important changes required in file *"app\_general.ini"* found in the **"conf"** folder.
