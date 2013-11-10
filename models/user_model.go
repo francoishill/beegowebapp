@@ -22,19 +22,15 @@ type Setting struct {
 // IsActivated: set active when email is verified
 // IsBanned: forbid user login
 type User struct {
-	Id          int64  `orm:"pk;auto"`
-	Email       string `orm:"unique;size(240)" valid:"Required; Email; MaxSize(240)"` //User unique email
-	Password    string `orm:"size(240)"`                                              //User password
-	IsActivated bool   `orm:"index;default(false)"`
-	/*DatabaseName string    `orm:"index;null"` //Allow null as we first insert the record to get the ID and use it as part of Dbname
-	DbUsername   string    `orm:"size(240)"`
-	DbPassword   string    `orm:"size(240)"`
-	//ServerLocation string `orm:"null"` //Can add an url to the server later on*/
-	IsAdmin  bool      `orm:"index"`
-	IsBanned bool      `orm:"index"`
-	Rands    string    `orm:"size(10)"`
-	Created  time.Time `orm:"auto_now_add"`
-	Updated  time.Time `orm:"auto_now"`
+	Id          int64            `orm:"pk;auto"`
+	Email       string           `orm:"unique;size(240)" valid:"Required; Email; MaxSize(240)"` //User unique email
+	Password    string           `orm:"size(240)"`                                              //User password
+	IsActivated bool             `orm:"index;default(false)"`
+	IsAdmin     bool             `orm:"index"`
+	IsBanned    bool             `orm:"index"`
+	Rands       string           `orm:"size(10)"`
+	Created     time.Time        `orm:"auto_now_add"`
+	Updated     time.Time        `orm:"auto_now"`
 	Lang        int              `orm:"index"`
 	LangAdds    SliceStringField `orm:"size(50)"`
 }

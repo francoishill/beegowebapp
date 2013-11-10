@@ -109,7 +109,7 @@
 		var $alert = $form.find('.alert');
 		var url = $form.attr('action');
 		var data = $form.find('input').fieldSerialize();
-		if ($.trim($form.find("[name=UserName]").val()) === '' ||
+		if ($.trim($form.find("[name=Email]").val()) === '' ||
 			$.trim($form.find("[name=Password]").val()) === '') {
 			$form.shake();
 			return false;
