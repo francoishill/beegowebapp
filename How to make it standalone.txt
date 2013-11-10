@@ -1,4 +1,4 @@
-1. Copy the EXE with the "static" and "views" folders.
+1. Copy the EXE with the "conf", "static" (and static_source if development mode) and "views" folders.
 2. Make sure the conf/app_general.ini has correct settings and DB settings
 3. Run db migration by calling: ???.exe orm syncdb -v=true >> migration.log
 4. Check the migration.log file to ensure it succeeded
