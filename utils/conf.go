@@ -19,6 +19,8 @@ import (
 
 	"github.com/francoishill/runsass"
 
+	"fmt"
+
 	//"strconv"
 	"time"
 
@@ -30,20 +32,22 @@ const (
 )
 
 var (
-	AppName             string
-	AppDescription      string
-	AppKeywords         string
-	AppVer              string
-	AppHost             string
-	AppUrl              string
-	AppLogo             string
-	AvatarURL           string
-	SecretKey           string
-	IsProMode           bool
-	MailUser            string
-	MailFrom            string
-	ActivationCodeLives int
-	ResetPwdCodeLives   int
+	SassSourceFolder      string
+	SassDestinationFolder string
+	AppName               string
+	AppDescription        string
+	AppKeywords           string
+	AppVer                string
+	AppHost               string
+	AppUrl                string
+	AppLogo               string
+	AvatarURL             string
+	SecretKey             string
+	IsProMode             bool
+	MailUser              string
+	MailFrom              string
+	ActivationCodeLives   int
+	ResetPwdCodeLives     int
 	//LoginRememberDays   int
 	DateFormat     string
 	DateTimeFormat string
@@ -143,6 +147,9 @@ func LoadConfig() *goconfig.ConfigFile {
 }
 
 func reloadConfig() {
+	SassSourceFolder = Cfg_General.MustValue("sass", "sass_source_folder")
+	SassDestinationFolder = Cfg_General.MustValue("sass", "sass_destination_folder")
+
 	AppName = Cfg_General.MustValue("app", "app_name")
 	beego.AppName = AppName
 
@@ -269,9 +276,24 @@ func configWatcher() {
 }
 
 func runSassCommand() {
+	scssPath, err := filepath.Abs(SassSourceFolder)
+	if err != nil {
+		panic(err)
+	}
+	cssPath, err := filepath.Abs(SassDestinationFolder)
+	if err != nil {
+		panic(err)
+	}
+
+	scssPath = SanitizePath(scssPath)
+	cssPath = SanitizePath(cssPath)
+	if exist, _ := PathExists(scssPath); !exist {
+		fmt.Println("Sass path does not exist: " + scssPath)
+		return
+	}
 	sett := runsass.Settings{
-		SourceDir:      `C:\Francois\Other\_myapp_clone_beegowebapp\static_source\scss`,
-		DestinationDir: `C:\Francois\Other\_myapp_clone_beegowebapp\static_source\css`,
+		SourceDir:      scssPath,
+		DestinationDir: cssPath,
 	}
 	//sett.RunCommand()
 

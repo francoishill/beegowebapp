@@ -9,8 +9,11 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash"
+	"os"
+	"path"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -325,4 +328,19 @@ func (a argAny) Get(i int, args ...interface{}) (r interface{}) {
 		r = args[0]
 	}
 	return
+}
+
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+func SanitizePath(fileOrDirPath string) string {
+	return path.Clean(strings.Replace(fileOrDirPath, "\\", "/", -1))
 }
