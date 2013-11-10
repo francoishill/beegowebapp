@@ -47,6 +47,7 @@ We have also included the following libraries into the design (they are laid out
     go get github.com/howeyc/fsnotify
     go get github.com/beego/compress
     go get github.com/go-sql-driver/mysql
+    go get github.com/francoishill/runsass
     go get github.com/francoishill/beegowebapp
     ```
 
