@@ -35,9 +35,11 @@ func (this *GeneralRouter) Acknowledgements() {
 		ExtraDetails string //Optional
 	}
 
+	basedOnBeego := this.Locale.Tr("based_on") + " Beego"
+
 	listOfAcknowledgements := []acknowledgement{}
 	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Beego", Url: "https://github.com/astaxie/beego"})
-	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Wetalk", Url: "https://github.com/beego/wetalk", ExtraDetails: "Built on Beego"})
+	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Wetalk", Url: "https://github.com/beego/wetalk", ExtraDetails: basedOnBeego})
 	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Angular JS", Url: "http://angularjs.org/"})
 	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Bootstrap", Url: "http://getbootstrap.com"})
 	listOfAcknowledgements = append(listOfAcknowledgements, acknowledgement{Name: "Jquery", Url: "http://jquery.com/"})
