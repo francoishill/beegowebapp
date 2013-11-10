@@ -17,6 +17,8 @@ import (
 	"github.com/beego/compress"
 	"github.com/beego/i18n"
 
+	"github.com/francoishill/runsass"
+
 	//"strconv"
 	"time"
 
@@ -47,7 +49,7 @@ var (
 	DateTimeFormat string
 	//RealtimeRenderMD bool
 	CompressSettings *compress.Settings
-	Langs               []string
+	Langs            []string
 )
 
 var (
@@ -94,6 +96,9 @@ func LoadConfig() *goconfig.ConfigFile {
 	reloadConfig_MachineSpecific()
 
 	IsProMode = beego.RunMode == "pro"
+
+	runSassCommand() //Must be after IsProMode
+
 	if IsProMode {
 		beego.SetLevel(beego.LevelInfo)
 	} else {
@@ -251,6 +256,8 @@ func configWatcher() {
 						settingCompress()
 						beego.Info("Beego Compress Reloaded")
 					}
+				case ".scss", ".sass":
+					runSassCommand()
 				}
 			}
 		}
@@ -259,6 +266,22 @@ func configWatcher() {
 	if err := watcher.WatchFlags("conf", fsnotify.FSN_MODIFY); err != nil {
 		beego.Error(err)
 	}
+}
+
+func runSassCommand() {
+	sett := runsass.Settings{
+		SourceDir:      `C:\Francois\Other\_myapp_clone_beegowebapp\static_source\scss`,
+		DestinationDir: `C:\Francois\Other\_myapp_clone_beegowebapp\static_source\css`,
+	}
+	//sett.RunCommand()
+
+	runCmd := runsass.RunSassAll{Cache: false, Verbose: true}
+	if IsProMode {
+		runCmd.Style = "compressed"
+	} else {
+		runCmd.Style = "nested"
+	}
+	runCmd.Run(&sett)
 }
 
 func IsMatchHost(uri string) bool {
