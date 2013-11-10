@@ -1,6 +1,6 @@
 Important to CLONE first
 ========================
-Do not edit this code directly, after installing it use the clone tool (clonebeegowebapp) as described in "Quick Start" below.
+Do not edit this code directly, after installing it use the clone tool (clonebeegowebapp) as described in "Quick Start" below to get you up and running.
 
 
 # What is this?
