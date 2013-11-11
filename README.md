@@ -78,7 +78,7 @@ We have also included the following libraries into the design (they are laid out
     clonebeegowebapp blank --foldername="myfirstapp"
     ```
     
-0. #### Important changes required in file *"app\_general.ini"* found in the **"conf"** folder.
+0. #### Important changes required in file `app_general.ini` found in the `conf` folder.
 
     ```ini
     [app]
@@ -94,7 +94,29 @@ We have also included the following libraries into the design (they are laid out
     data_source = main_db_username:main_db_password@/main_db_name?charset=utf8
     ```
     
-0. #### Have a look at the file **"app\_machine\_specific.ini"** too.
+0. #### Have a look at the file `app_machine_specific.ini` too.
+
+
+0. #### Change the following in localization files (`conf/locale_....ini`)
+
+    ```ini
+    AF =
+    EN-US =
+    app_name =
+    app_intro =
+    app_desc =
+    app_keywords =
+    app_welcome_message =
+    app_brand =
+    app_copyright =
+    slogan =
+    app_meta_author_firstname =
+    app_meta_author_surname =
+    ```
+    
+    Note: the values of `AF` and `EN-US` are what will be displayed to the user when choosing languages. To create another language just add a new `.ini` file in the `conf` folder with its localization key and add its display value to each localization `.ini` file.
+    
+    For instance to add chinese create a file named `locale_zh-CN.ini`. Then add `zh-CN = Chinese` to each localization `.ini` file, including `locale_zh-CN.ini` itsself.
     
     
 0. #### If you configured mysql to be the session provider, create its required table with the following SQL:
