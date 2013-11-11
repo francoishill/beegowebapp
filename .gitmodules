@@ -1,0 +1,6 @@
+[submodule "db/windows_portable_mysql"]
+	path = db/windows_portable_mysql
+	url = git@github.com:francoishill/windows_portable_mysql.git
+[submodule "db/windows_heidisql_portable"]
+	path = db/windows_heidisql_portable
+	url = git@github.com:francoishill/windows_heidisql_portable.git
