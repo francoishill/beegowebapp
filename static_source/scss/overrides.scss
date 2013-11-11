@@ -6,3 +6,7 @@
 select, textarea, input, .uneditable-input {
 	margin-bottom: 0;
 }
+
+.select2-choices {
+	min-width: 100px;
+}
