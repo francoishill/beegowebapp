@@ -141,16 +141,21 @@ We have also included the following libraries into the design (they are laid out
     
 ## Running on another machine
 
-If you want to run the web app on another machine you will only need to copy the executable and three folders (in development mode it is four folders).
+To run as a stand-alone web server on another machine you will only need **1. a database** and **2. to copy the following files/folders**:
 
-In production mode: 
+0. conf
+0. static
+0. static_source
+0. views
+0. ??.exe (your applications' executable, on windows it will have the extension .exe)
 
-    conf (the complete folder)
-    static (the complete folder)
-    views (the complete folder)
-    ??.exe (your applications' executable, on windows it will have the extension .exe)
-    
-In **development** mode is the same as production but you will also need to copy the *static_source* folder.
+
+#### Portable MySql tools (windows only)
+
+- A portable MySql server: [https://github.com/francoishill/windows_portable_mysql](https://github.com/francoishill/windows_portable_mysql)
+- A portable Admin tool for MySql: [https://github.com/francoishill/windows_heidisql_portable](https://github.com/francoishill/windows_heidisql_portable)
+
+
 
 
 # Contribution
