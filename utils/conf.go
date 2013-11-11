@@ -297,7 +297,8 @@ func runSassCommand() {
 	}
 	//sett.RunCommand()
 
-	runCmd := runsass.RunSassAll{Cache: false, Verbose: true}
+	// runCmd := runsass.RunSassAll{Cache: false, Verbose: true}
+	runCmd := runsass.RunSassAll{Cache: true, Verbose: true}
 	if IsProMode {
 		runCmd.Style = "compressed"
 	} else {
