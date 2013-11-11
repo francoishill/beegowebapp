@@ -2,7 +2,7 @@
 	<div class="container footer-wrap">
 		<div class="pull-right desc">
 			<p>
-				Ver.{{.AppVer}} - <span title="Page rendering time">{{.PageStartTime|loadtimes}}ms.</span>
+				Ver.{{.AppVer}} - <span title="{{i18n .Lang "page_render_time"}}">{{.PageStartTime|loadtimes}}ms.</span>
 			</p>
 			<p>
 				<strong>{{i18n .Lang "language_choice"}}: </strong>
