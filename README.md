@@ -83,6 +83,9 @@ We have also included the following libraries into the design (they are laid out
     ```ini
     [app]
     app_name = My Web Application
+    
+    author_firstname = Francois
+    author_surname = Hill
 
     session_path = sess_db_username:sess_db_password@/sess_db_name?charset=utf8
     session_name = myapp_session
