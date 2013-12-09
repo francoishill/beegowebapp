@@ -42,6 +42,7 @@ We have also included the following libraries into the design (they are laid out
 
     ```bash
     go get github.com/astaxie/beego
+    go get github.com/astaxie/bee
     go get github.com/Unknwon/goconfig
     go get github.com/beego/i18n
     go get github.com/howeyc/fsnotify
