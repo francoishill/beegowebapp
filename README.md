@@ -169,4 +169,3 @@ Please feel free to contribute or to contact me.
 ## License
 
 [The MIT License (MIT)](http://opensource.org/licenses/MIT).
-
